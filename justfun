@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Jumping Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="obstacle"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game-container {
+    width: 400px;
+    height: 200px;
+    border-bottom: 2px solid black;
+    position: relative;
+    overflow: hidden;
+}
+
+#player {
+    width: 20px;
+    height: 20px;
+    background-color: dodgerblue;
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+}
+
+#obstacle {
+    width: 20px;
+    height: 20px;
+    background-color: tomato;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    animation: move-obstacle 2s linear infinite;
+}
+
+#player.jump {
+    animation: player-jump 0.5s ease-out;
+}
+
+@keyframes move-obstacle {
+    0% {
+        right: -20px;
+    }
+    100% {
+        right: 400px;
+    }
+}
+
+@keyframes player-jump {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-80px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+const player = document.getElementById('player');
+const obstacle = document.getElementById('obstacle');
+const gameContainer = document.getElementById('game-container');
+
+// A variable to track if the player is currently jumping
+let isJumping = false;
+
+// Function to make the player jump
+function jump() {
+    // Only allow jumping if the player is not already in the air
+    if (!isJumping) {
+        isJumping = true;
+        player.classList.add('jump');
+
+        // After the jump animation is complete, remove the 'jump' class
+        setTimeout(() => {
+            player.classList.remove('jump');
+            isJumping = false;
+        }, 500); // 500ms should match the CSS animation duration
+    }
+}
+
+// Function to check for collisions
+function checkCollision() {
+    const playerRect = player.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
+
+    if (
+        playerRect.x < obstacleRect.x + obstacleRect.width &&
+        playerRect.x + playerRect.width > obstacleRect.x &&
+        playerRect.y < obstacleRect.y + obstacleRect.height &&
+        playerRect.y + playerRect.height > obstacleRect.y
+    ) {
+        // Collision detected
+        alert('Game Over!');
+        location.reload(); // Reload the game
+    }
+}
+
+// Listen for keyboard input (spacebar)
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'Space') {
+        jump();
+    }
+});
+
+// Start checking for collisions every 10 milliseconds
+setInterval(checkCollision, 10);
